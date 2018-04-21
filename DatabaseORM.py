@@ -1,3 +1,11 @@
+#
+# CREATED BY JOHN GRUN
+#   APRIL 18 2018 
+#
+# TESTED BY JOHN GRUN
+#
+#MODIFIED BY JOHN GRUN 
+#
 from config import (MYSQL_DB_URI)
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
