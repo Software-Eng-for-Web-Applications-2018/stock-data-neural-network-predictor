@@ -35,7 +35,6 @@ class StockPriceMinute(Base):
     low = Column(Float)
 
 
-
 engine = create_engine(MYSQL_DB_URI,echo=True);
 
 Session = sessionmaker(bind=engine);
