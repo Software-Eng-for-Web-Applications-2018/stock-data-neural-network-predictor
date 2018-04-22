@@ -19,26 +19,8 @@ import matplotlib.pyplot as plt
 
 from DatabaseORM import session, StockPriceMinute
 from DataArrayTools import ShitftAmount,TrimArray
+from SupportPredictorFunctions import GetStockDataList, SaveModelAndQuit
 
-def GetStockDataList(session,DatabaseTables,stocksym):
-    #Grabs the given data elements from the passed in database table object as defined in the ORM for a given stock symbol
-    QueryList = session.query(DatabaseTables.high,DatabaseTables.low,DatabaseTables.volume).filter(DatabaseTables.sym == stocksym).all()
-    #QueryList = session.query(DatabaseTables.high).filter(DatabaseTables.sym == stocksym).all()
-    #, StockPriceMinute.volume
-    Formatedlist = []; 
-    for DataElement in  QueryList:
-        Formatedlist.append(list(DataElement))
-    # Returns a np.array of [[row],[row],[row],[row]] where row = [element1, element2,etc] rows are defined by the query above
-    return np.array(Formatedlist);
-    #print(Formatedlist)
-
-# Xdata = np.array([[0,0],[1,1],[2,2],[3,3],[4,4],[5,5],[6,6],[7,7],[8,8],[9,9]]);
-
-def SaveModelAndQuit(sessionname,ModelName):
-    saver = tf.train.Saver()  
-    ModelName = './' + ModelName
-    saver.save(sessionname, ModelName)
-    sys.exit(0)
 
 # def RestoreModel(ModelName):
 #     new_saver = tf.train.import_meta_graph(ModelName)
@@ -49,19 +31,19 @@ def SaveModelAndQuit(sessionname,ModelName):
 #     feed_dict ={w1:13.0,w2:17.0}
 
 
-def TrainNeuralNetwork(session,DatabaseTables,stocksym,TrainThreshold,DEBUG):
+def TrainNeuralNetwork(session,DatabaseTables,stocksym,RelativeTimeShift,TrainThreshold,DEBUG):
 
 
     #Xdata = GetStockDataList(session,StockPriceMinute,'AMD');
     Xdata = GetStockDataList(session,DatabaseTables,stocksym);
 
-    print(Xdata)
+    #print(Xdata)
 
     # Shitf the training dat by X timeuits into the "future"
-    Ydata = ShitftAmount(Xdata,1)
+    Ydata = ShitftAmount(Xdata,RelativeTimeShift)
 
     #Make the data arrays the same length 
-    Xdata = TrimArray(Xdata,-1)
+    Xdata = TrimArray(Xdata,(-1*RelativeTimeShift))
 
     LengthOfDataSet = len(Xdata)
 
@@ -210,7 +192,8 @@ def TrainNeuralNetwork(session,DatabaseTables,stocksym,TrainThreshold,DEBUG):
                 pred = net.run(Out, feed_dict={X: X_test})
                 Error = np.average(np.abs(y_test - pred))
                 if(Error < TrainThreshold):
-                    SaveModelAndQuit(net,stocksym)
+                    ModelName = 'NN' + stocksym
+                    SaveModelAndQuit(net,ModelName)
 
 
 
@@ -242,4 +225,4 @@ def TrainNeuralNetwork(session,DatabaseTables,stocksym,TrainThreshold,DEBUG):
 #     #  
 
 #TrainThreshold = 5.0
-TrainNeuralNetwork(session,StockPriceMinute,'AMD',0.05,1)
+TrainNeuralNetwork(session,StockPriceMinute,'AMD',1,0.05,1)
