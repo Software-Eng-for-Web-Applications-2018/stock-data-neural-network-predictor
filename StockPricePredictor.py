@@ -7,9 +7,19 @@
 #MODIFIED BY JOHN GRUN 
 #
 
+##REFERENCES
 #Based upon examples from the tensorflow cookbook
 
 #http://cv-tricks.com/tensorflow-tutorial/save-restore-tensorflow-models-quick-complete-tutorial/
+
+#https://github.com/llSourcell/How-to-Deploy-a-Tensorflow-Model-in-Production
+
+#https://www.tensorflow.org/serving/serving_basic
+
+#https://github.com/tensorflow/serving/blob/master/tensorflow_serving/example/mnist_saved_model.py
+
+#https://github.com/tensorflow/tensorflow/tree/master/tensorflow/python/saved_model
+
 import sys
 import tensorflow as tf
 import numpy as np
@@ -17,9 +27,19 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
-from DatabaseORM import session, StockPriceMinute
+
+from DatabaseORM import session, StockPriceMinute, StockPriceDay
 from DataArrayTools import ShitftAmount,TrimArray
 from SupportPredictorFunctions import GetStockDataList, SaveModelAndQuit
+
+
+
+# from tensorflow.python.saved_model import builder
+from tensorflow.python.saved_model import signature_constants
+from tensorflow.python.saved_model import signature_def_utils
+from tensorflow.python.saved_model import tag_constants
+from tensorflow.python.saved_model import utils
+
 
 
 # def RestoreModel(ModelName):
@@ -111,8 +131,8 @@ def TrainNeuralNetwork(session,DatabaseTables,stocksym,RelativeTimeShift,TrainTh
     net = tf.InteractiveSession()
 
     # # Placeholder
-    X = tf.placeholder(dtype=tf.float32, shape=[None, NumElementsPerRow])
-    Y = tf.placeholder(dtype=tf.float32, shape=[None])
+    X = tf.placeholder(dtype=tf.float32, shape=[None, NumElementsPerRow],name='inputs')
+    Y = tf.placeholder(dtype=tf.float32, shape=[None],name='outputs')
 
     # # Initializers
     sigma = 1
@@ -193,7 +213,45 @@ def TrainNeuralNetwork(session,DatabaseTables,stocksym,RelativeTimeShift,TrainTh
                 Error = np.average(np.abs(y_test - pred))
                 if(Error < TrainThreshold):
                     ModelName = 'NN' + stocksym
-                    SaveModelAndQuit(net,ModelName)
+                    #SaveModelAndQuit(net,ModelName)
+                    ModelName = './' + ModelName
+                    #saver.save(sessionname, ModelName)
+
+                    export_path_base = ModelName
+                    print('Exporting trained model to' + export_path_base)
+
+                    builder = tf.saved_model.builder.SavedModelBuilder(export_path_base)
+
+                    classification_inputs = utils.build_tensor_info(X)
+                    classification_outputs_classes = utils.build_tensor_info(Y)
+                    #classification_outputs_scores = utils.build_tensor_info(values)
+
+
+                    classification_signature = signature_def_utils.build_signature_def(
+                        inputs={signature_constants.CLASSIFY_INPUTS: classification_inputs},
+                        outputs={signature_constants.CLASSIFY_OUTPUT_CLASSES:classification_outputs_classes},
+                        method_name=signature_constants.CLASSIFY_METHOD_NAME)
+
+                    tensor_info_x = utils.build_tensor_info(X)
+                    tensor_info_y = utils.build_tensor_info(Y)
+
+                    prediction_signature = signature_def_utils.build_signature_def(
+                      inputs={'Current_Information': tensor_info_x},
+                      outputs={'Future_Price': tensor_info_y},
+                      method_name=signature_constants.PREDICT_METHOD_NAME)
+
+                    legacy_init_op = tf.group(tf.tables_initializer(), name='legacy_init_op')
+
+                    #add the sigs to the servable
+                    builder.add_meta_graph_and_variables(net, [tag_constants.SERVING],signature_def_map={'predict_stock_prices':prediction_signature,signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY:classification_signature,},legacy_init_op=legacy_init_op)
+                    builder.save()
+
+
+                    print('Done exporting!\n')
+                    print("Exiting Normally\n")
+
+
+                    sys.exit(0)
 
 
 
