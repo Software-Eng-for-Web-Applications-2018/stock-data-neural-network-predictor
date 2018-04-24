@@ -12,6 +12,7 @@
 #http://cv-tricks.com/tensorflow-tutorial/save-restore-tensorflow-models-quick-complete-tutorial/
 import os
 import sys
+import argparse;
 import tensorflow as tf
 import numpy as np
 import pandas as pd
@@ -33,6 +34,9 @@ from SupportPredictorFunctions import GetStockDataList, SaveModelAndQuit
 
 tf.app.flags.DEFINE_integer('model_version', 1, 'version number of the model.')
 tf.app.flags.DEFINE_string('work_dir', '', 'Working directory.')
+tf.app.flags.DEFINE_string('sym', '', 'Stock Symbol')  
+tf.app.flags.DEFINE_integer('shiftamount', 1, 'Amount of time we wish to attept to predict into the future')
+tf.app.flags.DEFINE_integer('DEBUG', 0, 'Enable the debugging output')  
 FLAGS = tf.app.flags.FLAGS
 
 def TrainNeuralNetwork(session,DatabaseTables,stocksym,RelativeTimeShift,TrainThreshold,DEBUG):
@@ -201,7 +205,7 @@ def TrainNeuralNetwork(session,DatabaseTables,stocksym,RelativeTimeShift,TrainTh
                     #ModelName = 'NN' + stocksym
                     #SaveModelAndQuit(net,ModelName)
                         # Export model
-                    export_path_base = FLAGS.work_dir
+                    export_path_base = FLAGS.work_dir + 'NN_' + stocksym
                     export_path = os.path.join(tf.compat.as_bytes(export_path_base),tf.compat.as_bytes(str(FLAGS.model_version)))
                     #export_path = ModelName + '/' + export_path 
                     print('Exporting trained model to', export_path)
@@ -258,4 +262,21 @@ def TrainNeuralNetwork(session,DatabaseTables,stocksym,RelativeTimeShift,TrainTh
 #     #  
 
 #TrainThreshold = 5.0
-TrainNeuralNetwork(session,StockPriceMinute,'AMD',1,0.05,1)
+
+def main():
+
+    #user input
+    # learning rate 
+    parser = argparse.ArgumentParser();
+    parser.add_argument('--sym', dest= 'sym', default='');
+    parser.add_argument('--DEBUG',type=int, dest= 'debug', default=0);
+    parser.add_argument('--shiftamount',type=int, dest= 'shiftamount', default=1);
+    args = parser.parse_args();
+
+    print("Input Arguments: ") 
+    print(args)
+
+    #TrainSVMLinearRegression(session,StockPriceMinute,args.sym,args.shiftamount,args.debug);
+    TrainNeuralNetwork(session,StockPriceMinute,args.sym,args.shiftamount,0.03,args.debug)
+
+main();
