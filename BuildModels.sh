@@ -1,10 +1,21 @@
-python3 ./StockPricePredictor.py --sym 'AABA' --shiftamount 1 --DEBUG 0        
-python3 ./StockPricePredictor.py --sym 'AAPL' --shiftamount 1 --DEBUG 0   
-python3 ./StockPricePredictor.py --sym 'AMD' --shiftamount 1 --DEBUG 0        
-python3 ./StockPricePredictor.py --sym 'AMZN' --shiftamount 1 --DEBUG 0   
-python3 ./StockPricePredictor.py --sym 'C' --shiftamount 1 --DEBUG 0        
-python3 ./StockPricePredictor.py --sym 'INTC' --shiftamount 1 --DEBUG 0  
-python3 ./StockPricePredictor.py --sym 'MSFT' --shiftamount 1 --DEBUG 0        
-python3 ./StockPricePredictor.py --sym 'GOOGL' --shiftamount 1 --DEBUG 0  
-python3 ./StockPricePredictor.py --sym 'GOOG' --shiftamount 1 --DEBUG 0   
-python3 ./StockPricePredictor.py --sym 'VZ' --shiftamount 1 --DEBUG 0              
+python3 ./StockPricePredictor.py --sym 'AABA' --shiftamount 1 --DEBUG 0 --RT 0     
+python3 ./StockPricePredictor.py --sym 'AAPL' --shiftamount 1 --DEBUG 0 --RT 0
+python3 ./StockPricePredictor.py --sym 'AMD' --shiftamount 1 --DEBUG 0 --RT 0
+python3 ./StockPricePredictor.py --sym 'AMZN' --shiftamount 1 --DEBUG 0 --RT 0   
+python3 ./StockPricePredictor.py --sym 'C' --shiftamount 1 --DEBUG 0 --RT 0     
+python3 ./StockPricePredictor.py --sym 'INTC' --shiftamount 1 --DEBUG 0 --RT 0
+python3 ./StockPricePredictor.py --sym 'MSFT' --shiftamount 1 --DEBUG 0 --RT 0        
+python3 ./StockPricePredictor.py --sym 'GOOGL' --shiftamount 1 --DEBUG 0 --RT 0  
+python3 ./StockPricePredictor.py --sym 'GOOG' --shiftamount 1 --DEBUG 0 --RT 0   
+python3 ./StockPricePredictor.py --sym 'VZ' --shiftamount 1 --DEBUG 0 --RT 0              
+#Historical models
+python3 ./StockPricePredictor.py --sym 'AABA' --shiftamount 1 --DEBUG 0 --RT 1    
+python3 ./StockPricePredictor.py --sym 'AAPL' --shiftamount 1 --DEBUG 0 --RT 1
+python3 ./StockPricePredictor.py --sym 'AMD' --shiftamount 1 --DEBUG 0 --RT 1
+python3 ./StockPricePredictor.py --sym 'AMZN' --shiftamount 1 --DEBUG 0 --RT 1   
+python3 ./StockPricePredictor.py --sym 'C' --shiftamount 1 --DEBUG 0 --RT 1     
+python3 ./StockPricePredictor.py --sym 'INTC' --shiftamount 1 --DEBUG 0 --RT 1
+python3 ./StockPricePredictor.py --sym 'MSFT' --shiftamount 1 --DEBUG 0 --RT 1        
+python3 ./StockPricePredictor.py --sym 'GOOGL' --shiftamount 1 --DEBUG 0 --RT 1  
+python3 ./StockPricePredictor.py --sym 'GOOG' --shiftamount 1 --DEBUG 0 --RT 1   
+python3 ./StockPricePredictor.py --sym 'VZ' --shiftamount 1 --DEBUG 0 --RT 1   

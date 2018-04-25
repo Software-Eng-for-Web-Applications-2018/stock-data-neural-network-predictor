@@ -19,7 +19,8 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
-from DatabaseORM import session, StockPriceMinute
+#import database orm and models
+from DatabaseORM import session, StockPriceMinute, StockPriceDay
 from DataArrayTools import ShitftAmount,TrimArray
 from SupportPredictorFunctions import GetStockDataList, SaveModelAndQuit
 
@@ -37,9 +38,10 @@ tf.app.flags.DEFINE_string('work_dir', '', 'Working directory.')
 tf.app.flags.DEFINE_string('sym', '', 'Stock Symbol')  
 tf.app.flags.DEFINE_integer('shiftamount', 1, 'Amount of time we wish to attept to predict into the future')
 tf.app.flags.DEFINE_integer('DEBUG', 0, 'Enable the debugging output')  
+tf.app.flags.DEFINE_integer('RT', 0, 'Future 0 or Historical 1')
 FLAGS = tf.app.flags.FLAGS
 
-def TrainNeuralNetwork(session,DatabaseTables,stocksym,RelativeTimeShift,TrainThreshold,DEBUG):
+def TrainNeuralNetwork(session,DatabaseTables,stocksym,RelativeTimeShift,TrainThreshold,DEBUG,typeString):
 
 
     #Xdata = GetStockDataList(session,StockPriceMinute,'AMD');
@@ -205,7 +207,7 @@ def TrainNeuralNetwork(session,DatabaseTables,stocksym,RelativeTimeShift,TrainTh
                     #ModelName = 'NN' + stocksym
                     #SaveModelAndQuit(net,ModelName)
                         # Export model
-                    export_path_base = FLAGS.work_dir + 'NN_' + stocksym
+                    export_path_base = FLAGS.work_dir + 'NN_' + typeString + '_'+ stocksym
                     export_path = os.path.join(tf.compat.as_bytes(export_path_base),tf.compat.as_bytes(str(FLAGS.model_version)))
                     #export_path = ModelName + '/' + export_path 
                     print('Exporting trained model to', export_path)
@@ -271,12 +273,17 @@ def main():
     parser.add_argument('--sym', dest= 'sym', default='');
     parser.add_argument('--DEBUG',type=int, dest= 'debug', default=0);
     parser.add_argument('--shiftamount',type=int, dest= 'shiftamount', default=1);
+    parser.add_argument('--RT',type=int, dest= 'history', default=0);
     args = parser.parse_args();
 
     print("Input Arguments: ") 
     print(args)
 
     #TrainSVMLinearRegression(session,StockPriceMinute,args.sym,args.shiftamount,args.debug);
-    TrainNeuralNetwork(session,StockPriceMinute,args.sym,args.shiftamount,0.03,args.debug)
+    if(args.history == 0):
+        TrainNeuralNetwork(session,StockPriceMinute,args.sym,args.shiftamount,0.03,args.debug,'RT');
+    else:
+        TrainNeuralNetwork(session,StockPriceDay,args.sym,args.shiftamount,0.03,args.debug,'PAST');
+
 
 main();
