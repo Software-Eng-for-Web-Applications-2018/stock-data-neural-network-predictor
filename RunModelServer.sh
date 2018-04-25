@@ -1,4 +1,15 @@
 #! /bin/sh 
+
+#
+# CREATED BY JOHN GRUN
+#   APRIL 21 2018 
+#
+# TESTED BY JOHN GRUN
+#
+#MODIFIED BY JOHN GRUN 
+#
+
+
 tensorflow_model_server --port=9000 --model_name=NNModel --model_base_path=$(pwd)/NN_RT_AABA &
 tensorflow_model_server --port=9001 --model_name=NNModel --model_base_path=$(pwd)/NN_RT_AAPL &
 tensorflow_model_server --port=9002 --model_name=NNModel --model_base_path=$(pwd)/NN_RT_AMD &
